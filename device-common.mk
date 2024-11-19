@@ -1,7 +1,7 @@
 PRODUCT_SOONG_NAMESPACES += device/amlogic/yukawa
 
 ifeq ($(TARGET_PREBUILT_KERNEL),)
-LOCAL_KERNEL := device/amlogic/yukawa-kernel/$(TARGET_KERNEL_USE)/Image.lz4
+LOCAL_KERNEL := device/amlogic/yukawa-kernel/$(TARGET_KERNEL_USE)/Image
 else
 LOCAL_KERNEL := $(TARGET_PREBUILT_KERNEL)
 endif
@@ -22,6 +22,8 @@ ifeq ($(TARGET_USE_TABLET_LAUNCHER), true)
 # Setup tablet build
 $(call inherit-product, frameworks/native/build/tablet-10in-xhdpi-2048-dalvik-heap.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base.mk)
+# Packages to invoke RC pairing
+PRODUCT_PACKAGES += YukawaService YukawaAndroidOverlay
 else
 # Setup TV Build
 USE_OEM_TV_APP := true
@@ -72,6 +74,9 @@ PRODUCT_PACKAGES += \
     bootctrl.yukawa.recovery \
     bootctrl.yukawa
 endif
+
+# System RO FS Type
+TARGET_RO_FILE_SYSTEM_TYPE ?= ext4
 
 # Dynamic partitions
 PRODUCT_BUILD_SUPER_PARTITION := true
@@ -165,7 +170,7 @@ endif
 
 PRODUCT_PACKAGES += \
     libhidltransport \
-    libhwbinder 
+    libhwbinder
 
 PRODUCT_PROPERTY_OVERRIDES += ro.sf.lcd_density=320
 
@@ -181,7 +186,7 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES +=  vulkan.yukawa.so
 
 # Bluetooth
-PRODUCT_PACKAGES += android.hardware.bluetooth@1.1-service.btlinux
+PRODUCT_PACKAGES += android.hardware.bluetooth-service.default
 PRODUCT_PROPERTY_OVERRIDES += \
     bluetooth.core.gap.le.privacy.enabled=false \
     bluetooth.profile.asha.central.enabled=true \
@@ -350,7 +355,7 @@ PRODUCT_COPY_FILES += \
     frameworks/av/services/audiopolicy/config/usb_audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/usb_audio_policy_configuration.xml \
     frameworks/av/services/audiopolicy/config/default_volume_tables.xml:$(TARGET_COPY_OUT_VENDOR)/etc/default_volume_tables.xml \
     frameworks/av/services/audiopolicy/config/audio_policy_volumes.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_policy_volumes.xml \
-    frameworks/av/media/libeffects/data/audio_effects.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_effects.xml 
+    frameworks/av/media/libeffects/data/audio_effects.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_effects.xml
 
 AUDIO_DEFAULT_OUTPUT ?= speaker
 ifeq ($(AUDIO_DEFAULT_OUTPUT),hdmi)
@@ -373,10 +378,9 @@ PRODUCT_COPY_FILES += \
     frameworks/av/media/libstagefright/data/media_codecs_google_audio.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs_google_audio.xml
 
 # Enable BT Pairing with button BTN_0 (key 256)
-PRODUCT_PACKAGES += YukawaService YukawaAndroidOverlay
+
 PRODUCT_COPY_FILES += \
     device/amlogic/yukawa/input/Vendor_0001_Product_0001.kl:$(TARGET_COPY_OUT_VENDOR)/usr/keylayout/Vendor_0001_Product_0001.kl
-
 
 # Light HAL
 PRODUCT_PACKAGES += \
